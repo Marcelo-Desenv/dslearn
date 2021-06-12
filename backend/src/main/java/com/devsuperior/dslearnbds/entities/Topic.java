@@ -2,6 +2,8 @@ package com.devsuperior.dslearnbds.entities;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,119 +11,137 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.devsuperior.dslearnbds.entities.enums.DeliverStatus;
-
 @Entity
-@Table(name = "tb_deliver")
-public class Deliver implements Serializable  {
-
+@Table(name = "tb_topic")
+public class Topic implements Serializable {
+	
 	private static final long serialVersionUID = 1L;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private String uri;
+	private String title;
+	
+	@Column(columnDefinition = "TEXT")
+	private String body;
 	
 	@Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
 	private Instant moment;
-	private DeliverStatus status;
-	private String feedback;
-	private Integer correctCount;
 	
 	@ManyToOne
-	@JoinColumns({
-		@JoinColumn(name = "offer_id"),
-		@JoinColumn(name = "user_id")
-	})
-	private Enrollment enrollment;
+	@JoinColumn(name = "author_id")
+	private User author;
+	
+	@ManyToOne
+	@JoinColumn(name = "offer_id")
+	private Offer offer;
 	
 	@ManyToOne
 	@JoinColumn(name = "lesson_id")
 	private Lesson lesson;
 	
-	public Deliver() {
+	@ManyToMany
+	@JoinTable(name = "tb_topic_likes", 
+	           joinColumns = @JoinColumn(name = "topic_id"),
+	           inverseJoinColumns = @JoinColumn(name = "user_id"))
+	private Set<User> likes = new HashSet<>();
+	
+	
+	public Topic() {
 	}
 
-	public Deliver(Long id, String uri, Instant moment, DeliverStatus status, String feedback, Integer correctCount,
-			Enrollment enrollment, Lesson lesson) {
+
+	public Topic(Long id, String title, String body, Instant moment, User author, Offer offer, Lesson lesson) {
 		super();
 		this.id = id;
-		this.uri = uri;
+		this.title = title;
+		this.body = body;
 		this.moment = moment;
-		this.status = status;
-		this.feedback = feedback;
-		this.correctCount = correctCount;
-		this.enrollment = enrollment;
+		this.author = author;
+		this.offer = offer;
 		this.lesson = lesson;
 	}
+
 
 	public Long getId() {
 		return id;
 	}
 
+
 	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public String getUri() {
-		return uri;
+
+	public String getTitle() {
+		return title;
 	}
 
-	public void setUri(String uri) {
-		this.uri = uri;
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
+
+
+	public String getBody() {
+		return body;
+	}
+
+
+	public void setBody(String body) {
+		this.body = body;
+	}
+
 
 	public Instant getMoment() {
 		return moment;
 	}
 
+
 	public void setMoment(Instant moment) {
 		this.moment = moment;
 	}
 
-	public DeliverStatus getStatus() {
-		return status;
+
+	public User getAuthor() {
+		return author;
 	}
 
-	public void setStatus(DeliverStatus status) {
-		this.status = status;
+
+	public void setAuthor(User author) {
+		this.author = author;
 	}
 
-	public String getFeedback() {
-		return feedback;
+
+	public Offer getOffer() {
+		return offer;
 	}
 
-	public void setFeedback(String feedback) {
-		this.feedback = feedback;
+
+	public void setOffer(Offer offer) {
+		this.offer = offer;
 	}
 
-	public Integer getCorrectCount() {
-		return correctCount;
-	}
-
-	public void setCorrectCount(Integer correctCount) {
-		this.correctCount = correctCount;
-	}
-
-	public Enrollment getEnrollment() {
-		return enrollment;
-	}
-
-	public void setEnrollment(Enrollment enrollment) {
-		this.enrollment = enrollment;
-	}
 
 	public Lesson getLesson() {
 		return lesson;
 	}
 
+
 	public void setLesson(Lesson lesson) {
 		this.lesson = lesson;
 	}
+
+
+	public Set<User> getLikes() {
+		return likes;
+	}
+
 
 	@Override
 	public int hashCode() {
@@ -131,6 +151,7 @@ public class Deliver implements Serializable  {
 		return result;
 	}
 
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -139,7 +160,7 @@ public class Deliver implements Serializable  {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Deliver other = (Deliver) obj;
+		Topic other = (Topic) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
